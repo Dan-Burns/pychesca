@@ -22,7 +22,7 @@ args = parser.parse_args()
 try:
     df = pd.read_csv(args.file,index_col='RESI')
 except Exception as e:
-    print(f"Failed to read the spreadsheet file. Error: {e}")
+    print(f"Failed to read the spreadsheet file. Case Sensitive. Error: {e}")
 
 output_folder = args.output
 os.makedirs(output_folder)
@@ -56,8 +56,10 @@ dfc = pd.DataFrame(index=data.index)
 dfc['cluster_labels'] = fcluster(distance_matrix, threshold, criterion='distance')
 dfc.to_csv(f'{output_folder}/cluster_labels_{cutoff}.csv')
 # make dendrogram figure
+# to add cluster labels refer (possibly) to
+# https://stackoverflow.com/questions/35873273/display-cluster-labels-for-a-scipy-dendrogram
 fig, ax = plt.subplots(figsize=(30,10))
-dn = dendrogram(distance_matrix, color_threshold=3,ax=ax)
+dn = dendrogram(distance_matrix, color_threshold=threshold,ax=ax)
 ax.set_title('test')
 ax.grid(visible=False)
 ax.set_facecolor('white')
