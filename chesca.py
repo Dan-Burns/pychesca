@@ -67,6 +67,56 @@ ax.xaxis.set_tick_params(labelsize=15)
 # Display the dendogram
 fig.savefig(f'{output_folder}/dendrogram_{cutoff}.pdf')
 
+# SVD
+########### WORKING ON THIS ################
+# calculate the row mean ref to use as reference state
+# wild type reference will probably be better
+cols = df.columns
+row_mean = df.mean(axis=1)
+# CCS difference from mean 
+row_centered = df[cols].subtract(row_mean.values, axis=0)
+# column center the data
+column_mean = row_centered.mean(axis=0)
+column_centered = row_centered[cols].subtract(column_mean.values, axis=1)
+
+
+# SVD
+u, s, v = scipy.linalg.svd(column_centered)
+# make diagonal s matrix of correct shape
+sdiag = scipy.linalg.diagsvd(s,*column_centered.shape)
+# u dot s is score matrix of each res on each pc
+uds = u@sdiag
+# explained_variance
+s_variance = (s**2/(sum(s**2)))
+# V is loading score of each state
+vdf = pd.DataFrame(Vh, columns=[f'PC{i+1}' for i in range(len(df.columns))], index=df.columns)
+
+fig, ax = plt.subplots()
+ax.scatter(uds[:,0],uds[:,1])
+ax.scatter(v[:,0],v[:,1], marker="D")
+ax.vlines(0,1.5,-1.5, color='r')
+ax.hlines(0,1.5,-1.5, color='black')
+for i, txt in enumerate(list(df.columns)):
+    ax.annotate(txt, (v[i,0], v[i,1]))
+#ax.figure.savefig('/Users/dburns/Desktop/unfiltered_SVD_96.png')
+
+#### Filtering out residues that don't fall in large clusters before doing SVD again #######
+# Filter out residues that do not fall into large groups 
+above_cutoff = dfc['cluster_labels'].value_counts()>9
+clusters_to_keep = above_cutoff.index[above_cutoff].values
+resis_to_keep = dfc.index[dfc['cluster_labels'].isin(clusters_to_keep)]
+filtered = column_centered.loc[resis_to_keep]
+
+
+########################################################################
+
+
+
+
+
+
+
+
 
 
 #Pymol output
