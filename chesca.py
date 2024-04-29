@@ -48,8 +48,6 @@ threshold = 100-cutoff
 data = cor_dist
 # Use the linkage() function
 distance_matrix = linkage(data, method = 'complete', metric = 'euclidean')
-# Create a dendrogram (change color threshhold to see clusters above cutoff 2 means 98% and up)
-dn = dendrogram(distance_matrix, color_threshold=threshold)
 
 dfc = pd.DataFrame(index=data.index)
 # Assign cluster labels (2 is 98%)

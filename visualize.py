@@ -24,3 +24,10 @@ def clusters_to_pymol(df,output):
             f.write(f'select c_{cluster}, resi {sel}\n') 
             f.write(f'color {colors[cluster-1]}, c_{cluster}\n show spheres, c_{cluster}\n')
             
+
+# CHESCA clusters are often in agreement with local RMSD maxima -
+# include RMSD/ CHESCA visualization
+
+# also possible for no change in RMSD + CHESCA 
+# or no CHESCA but large changes
+# look for changes in rates
