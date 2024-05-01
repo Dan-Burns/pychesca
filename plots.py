@@ -5,25 +5,25 @@ import numpy as np
 from matplotlib.colors import Normalize, LinearSegmentedColormap, ListedColormap
 
 
-def plot_corr(HAG, cutoff=98, save_file=None):
+def plot_corr(HAC, cutoff=98, save_file=None):
     sns.set(font_scale=2)
     if cutoff == None:
-        corr = HAG.absolute_corr
+        corr = HAC.absolute_corr
     else:
-        corr = HAG.get_corr_above(cutoff)
+        corr = HAC.get_corr_above(cutoff)
     fig, ax = plt.subplots(figsize=(25,20))
     sns.heatmap(corr,cbar=False, ax=ax)
     ax.invert_yaxis()
     if save_file is not None:
         fig.savefig(save_file)
 
-def show_dendrogram(HAG, cutoff=98,
+def show_dendrogram(HAC, cutoff=98,
                      method='complete', metric='euclidean',
                      save_file=None):
 
     fig, ax = plt.subplots(figsize=(30,10))
     # dn is available for plt
-    dn = HAG.get_dendrogram(cutoff, method, metric ,ax=ax)
+    dn = HAC.get_dendrogram(cutoff, method, metric ,ax=ax)
     ax.set_title('CHESCA Clusters')
     ax.grid(visible=False)
     ax.set_facecolor('white')
@@ -85,7 +85,9 @@ def heatmap_correlation_cutoffs(df, min_corr=94, save_file='None'):
     # suggests making heatmaps of correlation coefficent cutoffs
 
     corr = df.T.corr().abs().fillna(0)
-    min_corr = min_corr/100
+    if min_corr > 1:
+        min_corr = min_corr/100
+
     # Mask out correlations below the minimum and diagonal
     mask = np.triu(np.ones_like(corr, dtype=bool)) | (np.abs(corr) < min_corr)
     

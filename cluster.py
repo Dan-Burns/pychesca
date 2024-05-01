@@ -5,11 +5,12 @@ import scipy
 import matplotlib.pyplot as plt
 
 
-class HAG:
+class HAC:
     '''
     Handle the Hiearchical Agglomerative Clustering of covarying chemical shifts
 
     TODO: handle reference state column
+    TODO: check cutoff function between 0-1 or 1-100
     '''
 
     def __init__(self,
@@ -23,7 +24,10 @@ class HAG:
 
     def get_corr_above(self, cutoff):
         'Return a df with correlation above cutoff'
-        return self.absolute_corr > cutoff/100
+        if cutoff > 1:
+            return self.absolute_corr > cutoff/100
+        else:
+            return self.absolute_corr > cutoff
 
 
     def get_distance_matrix(self, method='complete', metric='euclidean'):
@@ -47,6 +51,8 @@ class HAG:
         # the dendrogram will not reflect the changes
         # Have to run get_distance_matrix with the method and metric specified
         # there first
+        if cutoff < 1:
+            cutoff = cutoff * 100
         if (self.linkage is None) or ((method !='complete') and\
                                        (metric != 'euclidean')):
             self.get_distance_matrix(method, metric)
@@ -57,7 +63,8 @@ class HAG:
     def get_clusters(self, cutoff=98, criterion='distance',
                     method='complete', 
                     metric='euclidean'):
-        
+        if cutoff < 1:
+            cutoff = cutoff * 100
 
         self.dfc = pd.DataFrame(index=self.corr_distance.index)
         # Assign cluster labels
