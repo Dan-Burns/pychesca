@@ -3,6 +3,8 @@ import plots
 import svd
 import pandas as pd
 
+# This is intended to give the option to run chesca interactively.
+
 run = True
 
 while run == True:

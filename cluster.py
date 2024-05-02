@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 
 class HAC:
     '''
-    Handle the Hiearchical Agglomerative Clustering of covarying chemical shifts
+    Handle the Hiearchical Agglomerative Clustering 
 
     TODO: handle reference state column
-    TODO: check cutoff function between 0-1 or 1-100
+    
     '''
 
     def __init__(self,
@@ -19,6 +19,8 @@ class HAC:
                  method='complete', 
                  metric='euclidean'):
         self.df = df
+        # dealing with cutoff as a percentage since the clustering algorithms
+        # don't treat it as a decimal 
         if cutoff < 1:
             self.cutoff = cutoff * 100
         else:

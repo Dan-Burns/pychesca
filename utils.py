@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.cluster import AgglomerativeClustering as AG
 from scipy.cluster.hierarchy import dendrogram, fcluster, linkage
 
-
+# probably not going to need this.
 def determine_filetype(file):
     return file.split('.')[-1]
 

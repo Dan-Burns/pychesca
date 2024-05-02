@@ -1,3 +1,7 @@
+# functions to prepare pymol files that let you visualize the chesca results
+# on the structure.
+
+
 def clusters_to_pymol(df,output):
     '''
     take a df of residue indices and cluster labels

@@ -7,6 +7,9 @@ import os
 import sys
 import argparse
 import matplotlib.pyplot as plt
+# Was the sandbox script
+# this will end up importing the finished functions and run the whole analysis in one go
+
 
 # Create the parser
 parser = argparse.ArgumentParser(description='Load a csv into pandas')
