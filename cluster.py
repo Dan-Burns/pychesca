@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd 
-from scipy.cluster.hierarchy import dendrogram, fcluster, linkage
+from scipy.cluster.hierarchy import fcluster, linkage
 import scipy
 import matplotlib.pyplot as plt
 
@@ -14,12 +14,24 @@ class HAC:
     '''
 
     def __init__(self,
-                 df):
+                 df,
+                 cutoff=98,
+                 method='complete', 
+                 metric='euclidean'):
         self.df = df
+        if cutoff < 1:
+            self.cutoff = cutoff * 100
+        else:
+            self.cutoff = cutoff
+
         self.absolute_corr = df.T.corr().abs().fillna(0)
         self.corr_distance = 1 - self.absolute_corr
-        self.distance_matrix = self.get_distance_matrix()
-        self.linkage = None
+        self.method = method
+        self.metric = metric
+        self.linkage = self.get_distance_matrix(method=self.method,metric=self.metric)
+        
+        self.clusters = self.get_clusters()
+        self.n_clusters = self.clusters['cluster'].max()
 
 
     def get_corr_above(self, cutoff):
@@ -40,39 +52,41 @@ class HAC:
 
         self.linkage = linkage(self.corr_distance, method=method, metric=metric)
 
-    def get_dendrogram(self, cutoff=98, method='complete', metric='euclidean',
-                       ax=None):
-        '''
-        cutoff : int of float
-            distance (1-100) to consider in the same cluster
-        '''
-        # TODO
-        # If you use this function and specify different method or metric
-        # the dendrogram will not reflect the changes
-        # Have to run get_distance_matrix with the method and metric specified
-        # there first
-        if cutoff < 1:
-            cutoff = cutoff * 100
-        if (self.linkage is None) or ((method !='complete') and\
-                                       (metric != 'euclidean')):
-            self.get_distance_matrix(method, metric)
-        # Create a dendrogram (change color threshhold to see clusters above cutoff 2 means 98% and up)
-        return dendrogram(self.linkage, 
-                          color_threshold=100-cutoff, ax=ax)
+    # def get_dendrogram(self, method='complete', metric='euclidean',
+    #                    ax=None):
+    #     '''
+    #     cutoff : int of float
+    #         distance (1-100) to consider in the same cluster
+    #     '''
+    #     # TODO
+    #     # If you use this function and specify different method or metric
+    #     # the dendrogram will not reflect the changes
+    #     # Have to run get_distance_matrix with the method and metric specified
+    #     # there first
+        
+    #     if (self.linkage is None) or ((method !='complete') or\
+    #                                    (metric != 'euclidean')):
+    #         self.get_distance_matrix(method, metric)
+    #     # Create a dendrogram (change color threshhold to see clusters above cutoff 2 means 98% and up)
+    #     return dendrogram(self.linkage, 
+    #                       color_threshold=100-self.cutoff, 
+    #                       labels=self.df.index,
+    #                       ax=ax)
 
-    def get_clusters(self, cutoff=98, criterion='distance',
+    def get_clusters(self,criterion='distance',
                     method='complete', 
                     metric='euclidean'):
-        if cutoff < 1:
-            cutoff = cutoff * 100
+    
 
-        self.dfc = pd.DataFrame(index=self.corr_distance.index)
+        dfc = pd.DataFrame(index=self.corr_distance.index)
         # Assign cluster labels
-        if self.linkage == None:
-            self.linkage = self.get_distance_matrix(method, metric)
+        if self.linkage is None:
+            self.get_distance_matrix(method, metric)
 
-        self.dfc['cluster_labels'] = fcluster(self.linkage, 100-cutoff, 
+        dfc['cluster'] = fcluster(self.linkage, 100-self.cutoff, 
                                               criterion)
+        
+        return dfc
 
 # clustering of clusters is recommended.
 

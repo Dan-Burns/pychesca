@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 '''
 equations are from this paper and supplementary:
 
@@ -16,17 +17,39 @@ class Chespa:
     an antagonist/reverse agonist state (A)
     '''
     def __init__(self,
-                 file,
+                 file_path,
                  het_nuc='N'):
         '''
         The input csv file must have columns labeled {state}w1, {state}w2 
         for states ref, A, and B
+
+        file : str
+            path to csv file with columns refw1,refw2,Aw1,Aw2,.....
+        
+        het_nuc : str
+            Heteronucleus. Either 'N' (nitrogen) or 'C' (carbon)
         '''
-        df = pd.read_csv(file)
+        # index col needs to be the same as the ccs data and labeled 'RESI'
+        try:
+            df = pd.read_csv(file_path)
+            if df.columns[0].upper() != 'RESI':
+                print('The index column should be named "RESI".') 
+            else:
+                index_col = df.columns[0]
+                df = pd.read_csv(file_path, index_col=index_col)
+                # TODO - this isn't updating the column name  
+                df.rename(columns={index_col:'RESI'},inplace=True) 
+        except ValueError:
+            print('Make sure that your index column is named "RESI" in all caps.')
+        except FileNotFoundError:
+            print("Can't find that file.")
+        #print(df.head())
+        self.df = df
+        self.het_nuc = het_nuc
         if het_nuc == 'N':
-            het_coef = 0.2
+            self.het_coef = 0.2
         if het_nuc == 'C':
-            het_coef = 0.25
+            self.het_coef = 0.25
         # hetero nucleus shifts in column 0, H shifts in column 1 
         self.states = {
         'ref': df[['refw1','refw2']].values,
@@ -35,17 +58,18 @@ class Chespa:
         }
         self.ref_to_B = self.get_state_distance('B')
         self.ref_to_A = self.get_state_distance('A')
-        self.state_angles = self.get_state_angle()
+        self.cos_theta = self.get_state_angle()
+        self.X = self.get_fractional_activation()
 
     def get_state_distance(self, state):
         '''
         SI eq 5
         magnitude of vector between ref and state
         '''
-        
-        Hrb= (ref[:,1]-self.states[state][:,1])**2
-        Hetrb = (het_coef*(ref[:,0]-self.states[state][:,0]))**2
-        return np.sqrt(Hrb+Hetrb)
+        # ref to proton
+        rtoH= (self.states['ref'][:,1]-self.states[state][:,1])**2
+        rtohet = (self.het_coef*(self.states['ref'][:,0]-self.states[state][:,0]))**2
+        return np.sqrt(rtoH+rtohet)
         
     def get_state_angle(self):
         '''
@@ -73,7 +97,7 @@ class Chespa:
         shifts the protein  towards activation (X > 0) or inactivation (X < 0).
         '''
         ref, A, B = list(self.states.values())
-        # attribute?
+       
         # normalized vectors from ref
         vb = (B-ref)/np.linalg.norm((B-ref))
         va = (A-ref)/np.linalg.norm((A-ref))
