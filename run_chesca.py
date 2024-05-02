@@ -4,6 +4,10 @@ import svd
 import pandas as pd
 
 # This is intended to give the option to run chesca interactively.
+# output the dendrogram, svd, chespa (if reference state is available), and input parameters used
+# provide option to list the cluster ids you want to remove and run again (with new parameters potentially)
+# if pymol (try: pymol -r) and structure is available, automatically generate the clusters
+# in the viewer.
 
 run = True
 

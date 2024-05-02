@@ -4,7 +4,8 @@ import numpy as np
 from scipy.cluster.hierarchy import dendrogram
 
 from matplotlib.colors import Normalize, LinearSegmentedColormap, ListedColormap
-
+import warnings
+warnings.filterwarnings("ignore")
 
 def plot_corr(HAC, cutoff=None, save_file=None):
     sns.set(font_scale=2)
@@ -78,10 +79,13 @@ def get_cluster_annotation_positions(clusters, threshold):
 
 def show_dendrogram(HAC,
                      save_file=None,
+                     orientation='right',
                      leaf_rotation=None,
                      cutoff_line=False):
-
-    fig, ax = plt.subplots(figsize=(40,15))
+    if orientation == 'top':
+        fig, ax = plt.subplots(figsize=(40,15))
+    elif orientation == 'right':
+        fig, ax = plt.subplots(figsize=(15,40))
     # dn is available for plt
     #dn = HAC.get_dendrogram(method, metric ,ax=ax)
     threshold = 100-HAC.cutoff
@@ -89,11 +93,19 @@ def show_dendrogram(HAC,
                           color_threshold=threshold, 
                           labels=HAC.df.index,
                           ax=ax,
-                          leaf_rotation=leaf_rotation)
+                          orientation=orientation,
+                          leaf_rotation=leaf_rotation,
+                          leaf_font_size=14
+                          )
     clusters = HAC.clusters
     
     # Annotate the first occurrence of each cluster label
     xs, ys = get_cluster_annotation_positions(clusters, threshold)
+    if orientation == 'top':
+        pass
+    elif orientation == 'right':
+        xs, ys = ys, xs
+    
     for i, (x, y) in enumerate(zip(xs,ys)):
         # TODO: option to rotate these ids by 90 so you can view the dendrogram
         # enlarged somewhere else and rotated to more easily see which residues
@@ -104,12 +116,14 @@ def show_dendrogram(HAC,
     ax.set_title('CHESCA Clusters')
     ax.grid(visible=False)
     ax.set_facecolor('white')
-    if cutoff_line == True:
-        ax.axhline(y=threshold, linestyle='dashed')
+    # if cutoff_line == True:
+    #     ax.axhline(y=threshold, linestyle='dashed')
     ax.xaxis.set_tick_params(labelsize=15)
     #fig.show()
     if save_file is not None:
         fig.savefig(save_file)
+
+
 
 def plot_svd(SVD, centering='column', save_file=None):
     '''
@@ -159,6 +173,8 @@ def plot_svd(SVD, centering='column', save_file=None):
     if save_file is not None:
         fig.savefig(save_file)
 
+
+
 def heatmap_correlation_cutoffs(df, min_corr=94, save_file='None'):
     # Protein NMR chesca chapter 18 p. 403 Note 5
     # suggests making heatmaps of correlation coefficent cutoffs
@@ -183,10 +199,34 @@ def heatmap_correlation_cutoffs(df, min_corr=94, save_file='None'):
     if save_file is not None:
         fig.savefig(save_file)
 
+
+
 def plot_chespa(Chespa):
-    axs, fig = plt.subplots(3,1,)
+
+    chsp = Chespa
+    D = '\u0394'
+    d = '\u03B4'
+    theta = '\u03B8'
+
+    fig, axs = plt.subplots(3,1,figsize=(40,20))
+    resis = [str(i) for i in chsp.resis]
     for i, ax in enumerate(axs):
-        pass
+        if i == 0:
+            ax.bar(resis,chsp.ref_to_A)
+            ax.grid(visible=False)
+            ax.set_title(f'{D}{d}{chsp.het_nuc.upper()}Hcomb(ppm)')
+            ax.set_xticklabels(resis, fontdict={'size':12}, rotation=90);
+        elif i == 1:
+            ax.bar(resis, chsp.cos_theta)
+            ax.grid(visible=False)
+            ax.set_title(f'cos{theta}')
+            ax.set_xticklabels(resis, fontdict={'size':12}, rotation=90);
+        else:
+            ax.bar(resis, chsp.X)
+            ax.grid(visible=False)
+            ax.set_title(f'X (fractional activation)')
+            ax.set_xticklabels(resis, fontdict={'size':12}, rotation=90);
+    fig.tight_layout()
 
 
 def plot_everything():

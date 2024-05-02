@@ -17,7 +17,8 @@ class HAC:
                  df,
                  cutoff=98,
                  method='complete', 
-                 metric='euclidean'):
+                 metric='euclidean',
+                 cluster_states=False):
         self.df = df
         # dealing with cutoff as a percentage since the clustering algorithms
         # don't treat it as a decimal 
@@ -25,8 +26,10 @@ class HAC:
             self.cutoff = cutoff * 100
         else:
             self.cutoff = cutoff
-
-        self.absolute_corr = df.T.corr().abs().fillna(0)
+        if cluster_states == False:
+            self.absolute_corr = df.T.corr().abs().fillna(0)
+        else:
+            self.absolute_corr = df.corr().abs()
         self.corr_distance = 1 - self.absolute_corr
         self.method = method
         self.metric = metric

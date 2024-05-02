@@ -45,12 +45,14 @@ class Chespa:
             print("Can't find that file.")
         #print(df.head())
         self.df = df
+        self.resis = df['RESI'].to_list()
         self.het_nuc = het_nuc
         if het_nuc == 'N':
             self.het_coef = 0.2
         if het_nuc == 'C':
             self.het_coef = 0.25
         # hetero nucleus shifts in column 0, H shifts in column 1 
+        # TODO : add check to confirm heter shifts are greater than H shifts
         self.states = {
         'ref': df[['refw1','refw2']].values,
         'A': df[['Aw1','Aw2']].values,
@@ -94,13 +96,13 @@ class Chespa:
         Normalized projection of antagonist A onto agonist B
         from text:
         The fractional activation reveals whether a given perturbation 
-        shifts the protein  towards activation (X > 0) or inactivation (X < 0).
+        shifts the protein towards activation (X > 0) or inactivation (X < 0).
         '''
         ref, A, B = list(self.states.values())
        
         # normalized vectors from ref
         vb = (B-ref)/np.linalg.norm((B-ref))
         va = (A-ref)/np.linalg.norm((A-ref))
-        # row wise dot product of 2 n_residues X 2 arrays
+        # row wise dot product of 2 (n_residues X 2) arrays
         dot = (va*vb).sum(axis=1)
         return dot/((vb*vb).sum(axis=1))
