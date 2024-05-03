@@ -81,9 +81,10 @@ def show_dendrogram(HAC,
                      save_file=None,
                      orientation='right',
                      leaf_rotation=None,
-                     cutoff_line=False):
+                     cutoff_line=False,
+                     annotate_clusters=True):
     if orientation == 'top':
-        fig, ax = plt.subplots(figsize=(40,15))
+        fig, ax = plt.subplots(figsize=(8,5)) # 40, 15
     elif orientation == 'right':
         fig, ax = plt.subplots(figsize=(15,40))
     # dn is available for plt
@@ -105,13 +106,13 @@ def show_dendrogram(HAC,
         pass
     elif orientation == 'right':
         xs, ys = ys, xs
-    
-    for i, (x, y) in enumerate(zip(xs,ys)):
-        # TODO: option to rotate these ids by 90 so you can view the dendrogram
-        # enlarged somewhere else and rotated to more easily see which residues
-        # fall in a cluster -- or just orient the dn vertically with sp option
-        # BUUUUT - then annotation xs and ys need to be flipped.....
-        ax.text(x,y,f'{i+1}')
+    if annotate_clusters == True:
+        for i, (x, y) in enumerate(zip(xs,ys)):
+            # TODO: option to rotate these ids by 90 so you can view the dendrogram
+            # enlarged somewhere else and rotated to more easily see which residues
+            # fall in a cluster -- or just orient the dn vertically with sp option
+            # BUUUUT - then annotation xs and ys need to be flipped.....
+            ax.text(x,y,f'{i+1}')
 
     ax.set_title('CHESCA Clusters')
     ax.grid(visible=False)
@@ -140,7 +141,8 @@ def plot_svd(SVD, centering='column', save_file=None):
     centering : str
         valid options are 'column' for column centered 
         or 'row' for row centered
-    
+
+    TODO : add additional PC projections
     '''
     if centering == 'column':
         data = SVD.column_svd
