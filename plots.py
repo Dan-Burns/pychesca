@@ -206,6 +206,7 @@ def heatmap_correlation_cutoffs(df, min_corr=94, save_file='None'):
 def plot_chespa(Chespa):
 
     chsp = Chespa
+    # symbols for plot titles
     D = '\u0394'
     d = '\u03B4'
     theta = '\u03B8'
