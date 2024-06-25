@@ -23,7 +23,7 @@ args = parser.parse_args()
 
 # Read the Excel file into a pandas DataFrame
 try:
-    df = pd.read_csv(args.file,index_col='RESI')
+    df = pd.read_csv(args.file,index_col='Resi')
 except Exception as e:
     print(f"Failed to read the spreadsheet file. Case Sensitive. Error: {e}")
 
