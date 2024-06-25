@@ -82,7 +82,8 @@ def show_dendrogram(HAC,
                      orientation='right',
                      leaf_rotation=None,
                      cutoff_line=False,
-                     annotate_clusters=True):
+                     annotate_clusters=True,
+                     sub_cluster=None):
     if orientation == 'top':
         fig, ax = plt.subplots(figsize=(8,5)) # 40, 15
     elif orientation == 'right':
@@ -113,8 +114,10 @@ def show_dendrogram(HAC,
             # fall in a cluster -- or just orient the dn vertically with sp option
             # BUUUUT - then annotation xs and ys need to be flipped.....
             ax.text(x,y,f'{i+1}')
-
-    ax.set_title('CHESCA Clusters')
+    if sub_cluster is not None:
+        ax.set_title(f"Cluster {sub_cluster} States")
+    else:
+        ax.set_title('CHESCA Clusters')
     ax.grid(visible=False)
     ax.set_facecolor('white')
     # if cutoff_line == True:

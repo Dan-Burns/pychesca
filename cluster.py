@@ -40,9 +40,7 @@ class HAC:
         self.n_clusters = self.clusters['cluster'].max()
         if sub_cluster_cutoff is not None:
             self.sub_cluster_ids = self.get_clusters_above_cutoff(cutoff=sub_cluster_cutoff)
-            # can loop through all the indices and make all the sub cluster dendrograms available here.
-            self.sub_clusters = 
-            for clust_id in self.sub_clusters
+            
 
     def get_corr_above(self, cutoff):
         'Return a df with correlation above cutoff'
@@ -98,7 +96,7 @@ class HAC:
         
         return dfc
 
-# clustering of clusters is recommended.
+    # clustering of clusters is recommended.
 
     def get_clusters_above_cutoff(self, cutoff=3):
         '''

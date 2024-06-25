@@ -52,7 +52,7 @@ class Chespa:
         if het_nuc == 'C':
             self.het_coef = 0.25
         # hetero nucleus shifts in column 0, H shifts in column 1 
-        # TODO : can add check to confirm hetero shifts are greater than H shifts
+        # TODO : add check to confirm hetero shifts are greater than H shifts
         self.states = {
         'ref': df[['refw1','refw2']].values,
         'A': df[['Aw1','Aw2']].values,
