@@ -51,6 +51,9 @@ plot_corr(hac,args.cutoff, save_file=f'{output_folder}/correlation_matrix.pdf')
 # dendrogram
 show_dendrogram(hac, save_file=f'{output_folder}/dendrogram.pdf')
 
+# save the cluster assignment spreadsheet
+hac.clusters.sort_values('cluster').to_csv(f'{output_folder}/cluster_assignments.csv')
+
 
 # SVD
 dims = SVD(df)
