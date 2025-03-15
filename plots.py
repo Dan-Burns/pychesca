@@ -19,9 +19,10 @@ def plot_corr(HAC, cutoff=None, save_file=None):
     if save_file is not None:
         fig.savefig(save_file)
 
-def get_cluster_annotation_positions(clusters, threshold):
+def get_cluster_annotation_positions(clusters, threshold, ax, orientation):
     '''
     find the x and y values to add cluster labels to the dendrogram.
+
     
     Parameters
     ----------
@@ -32,6 +33,9 @@ def get_cluster_annotation_positions(clusters, threshold):
     threshold : int or float
         The threshold used for coloring the dendrogram
 
+    ax : matplotlib.axes.Axes
+        The axes object of the dendrogram plot
+
     Returns
     -------
     x : list
@@ -41,39 +45,60 @@ def get_cluster_annotation_positions(clusters, threshold):
     This is just the threshold value repeated for each x.
     
     '''
-    
-    # clusters go from left to right in dendrogram
+    ordered_indices = []
+    x_positions = []
+    if orientation == 'top':
+        for t in ax.get_xticklabels():
+            ordered_indices.append(float(t.get_text()))
+            x_positions.append(t.get_position())
+        x_positions = np.array(x_positions)
+    else:
+        for t in ax.get_yticklabels():
+            ordered_indices.append(float(t.get_text()))
+            x_positions.append(t.get_position())
+        x_positions = np.array(x_positions)
 
-    # track the farthest right x value because it will serve as the first point
-    # for the next cluster position 
-    r_pos = 0
     xs = []
-    ys = []
-    for cluster in range(1,clusters['cluster'].max()+1):
-        # indices of residues that fall in same cluster
-        c = np.where((clusters['cluster']==cluster))[0] # [0] to unpack tuple
-        # size of cluster * 10 tells you how wide it is in the dendrogram
-        # (assuming it's always a multiple of 10...)
-        # TODO: can check against dn['icoords'].max()/len(clusters.index)-1
-        # fyi: icoords are x1a,x2a,x1b,x2b for the two vertical line endpoints in dcoords.
-        width = c.shape[0]*10
-        if cluster == 1:
-            midpoint = width/2
-            xs.append(midpoint)
-            ys.append(threshold)
-            r_pos = width
+    for cluster in range(clusters['cluster'].max() + 1):
+        # index the x_positions by first putting the clusters df in the same order
+        # as the dendrogram and then using the indices to get the x positions for
+        # each residue in the cluster (taken from ax.get_xticklabels)
+        # and then us the midpoint of these values 
+        # the list of values will be in the order that the clusters appear in the dendrogram from
+        # left to right
+        if orientation == 'top':
+            vals = x_positions[np.where(clusters.loc[ordered_indices]['cluster']==cluster)][:,0]
         else:
-            midpoint = (width/2)+r_pos
-            xs.append(midpoint)
-            ys.append(threshold)
-            r_pos += width
+            vals = x_positions[np.where(clusters.loc[ordered_indices]['cluster']==cluster)][:,1]
+        xs.append(np.median(vals))
+
+    ys = [threshold] * len(xs)
+
     return xs, ys
 
+def plot_dendrogram(model, **kwargs):
+    # https://scikit-learn.org/stable/auto_examples/cluster/plot_agglomerative_dendrogram.html
+    # need this to plot the sklearn version
+    # Create linkage matrix and then plot the dendrogram
 
+    # create the counts of samples under each node
+    counts = np.zeros(model.children_.shape[0])
+    n_samples = len(model.labels_)
+    for i, merge in enumerate(model.children_):
+        current_count = 0
+        for child_idx in merge:
+            if child_idx < n_samples:
+                current_count += 1  # leaf node
+            else:
+                current_count += counts[child_idx - n_samples]
+        counts[i] = current_count
 
+    linkage_matrix = np.column_stack(
+        [model.children_, model.distances_, counts]
+    ).astype(float)
 
-
-
+    # Plot the corresponding dendrogram
+    dendrogram(linkage_matrix, **kwargs)
 
 
 
@@ -91,21 +116,24 @@ def show_dendrogram(HAC,
     # dn is available for plt
     #dn = HAC.get_dendrogram(method, metric ,ax=ax)
     threshold = 100-HAC.cutoff
-    dn = dendrogram(HAC.linkage, 
-                          color_threshold=threshold, 
-                          labels=HAC.df.index,
-                          ax=ax,
-                          orientation=orientation,
-                          leaf_rotation=leaf_rotation,
-                          leaf_font_size=14
+    kwargs = {'color_threshold':threshold,
+              'labels':HAC.corr_distance.index,
+              'ax':ax,
+              'orientation':orientation,
+              'leaf_rotation':leaf_rotation,
+              'leaf_font_size':14
+            }
+    dn = plot_dendrogram(HAC.linkage, 
+                          **kwargs
                           )
     clusters = HAC.clusters
     
     # Annotate the first occurrence of each cluster label
-    xs, ys = get_cluster_annotation_positions(clusters, threshold)
+    # treats the label as being on the x axis and then flips it after if it's oriented "right"
+    xs, ys = get_cluster_annotation_positions(clusters, threshold, ax, orientation)
     if orientation == 'top':
         pass
-    elif orientation == 'right':
+    elif orientation == 'right': 
         xs, ys = ys, xs
     if annotate_clusters == True:
         for i, (x, y) in enumerate(zip(xs,ys)):

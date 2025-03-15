@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd 
 from scipy.cluster.hierarchy import fcluster, linkage
+from sklearn.cluster import AgglomerativeClustering
 import scipy
 import matplotlib.pyplot as plt
 
@@ -55,48 +56,26 @@ class HAC:
         https://predictivehacks.com/hierarchical-clustering-in-python/
         Returns 
         -------
-        scipy.cluster.hierarchy.linkage
+        AgglomerativeClustering
         '''
+        self.linkage = AgglomerativeClustering(n_clusters=None, 
+                                               distance_threshold=100-self.cutoff, 
+                                               metric=metric, 
+                                               linkage=method)
+        return self.linkage.fit(self.corr_distance)
 
-        self.linkage = linkage(self.corr_distance, method=method, metric=metric)
-
-    # def get_dendrogram(self, method='complete', metric='euclidean',
-    #                    ax=None):
-    #     '''
-    #     cutoff : int of float
-    #         distance (1-100) to consider in the same cluster
-    #     '''
-    #     # TODO
-    #     # If you use this function and specify different method or metric
-    #     # the dendrogram will not reflect the changes
-    #     # Have to run get_distance_matrix with the method and metric specified
-    #     # there first
-        
-    #     if (self.linkage is None) or ((method !='complete') or\
-    #                                    (metric != 'euclidean')):
-    #         self.get_distance_matrix(method, metric)
-    #     # Create a dendrogram (change color threshhold to see clusters above cutoff 2 means 98% and up)
-    #     return dendrogram(self.linkage, 
-    #                       color_threshold=100-self.cutoff, 
-    #                       labels=self.df.index,
-    #                       ax=ax)
-
-    def get_clusters(self,criterion='distance',
+    def get_clusters(self, criterion='distance',
                     method='complete', 
                     metric='euclidean'):
     
-
         dfc = pd.DataFrame(index=self.corr_distance.index)
         # Assign cluster labels
         if self.linkage is None:
             self.get_distance_matrix(method, metric)
 
-        dfc['cluster'] = fcluster(self.linkage, 100-self.cutoff, 
-                                              criterion)
+        dfc['cluster'] = self.linkage.labels_
         
         return dfc
-
-    # clustering of clusters is recommended.
 
     def get_clusters_above_cutoff(self, cutoff=3):
         '''
