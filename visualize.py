@@ -35,3 +35,5 @@ def clusters_to_pymol(df,output):
 # also possible for no change in RMSD + CHESCA 
 # or no CHESCA but large changes
 # look for changes in rates
+# TODO limit to N clusters (following ChACRA significant PCs)
+# Determine if the individual clusters have overlap with a particular PC 

@@ -49,7 +49,7 @@ def get_cluster_annotation_positions(clusters, threshold, ax, orientation):
     x_positions = []
     if orientation == 'top':
         for t in ax.get_xticklabels():
-            ordered_indices.append(float(t.get_text()))
+            ordered_indices.append(float(t.get_text())) # TODO: the df indices need to be strings so this will work for clustering states
             x_positions.append(t.get_position())
         x_positions = np.array(x_positions)
     else:
