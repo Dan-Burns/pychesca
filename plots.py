@@ -19,7 +19,7 @@ def plot_corr(HAC, cutoff=None, save_file=None):
     if save_file is not None:
         fig.savefig(save_file)
 
-def get_cluster_annotation_positions(clusters, threshold, ax, orientation):
+def get_cluster_annotation_positions(clusters, threshold, ax, orientation, max_cor):
     '''
     find the x and y values to add cluster labels to the dendrogram.
 
@@ -45,16 +45,24 @@ def get_cluster_annotation_positions(clusters, threshold, ax, orientation):
     This is just the threshold value repeated for each x.
     
     '''
+    #TODO if the max value of the correlation distances is less than the cutoff
+    # Then use the max value as the y position
     ordered_indices = []
     x_positions = []
     if orientation == 'top':
         for t in ax.get_xticklabels():
-            ordered_indices.append(float(t.get_text())) # TODO: the df indices need to be strings so this will work for clustering states
+            try:
+                ordered_indices.append(float(t.get_text())) 
+            except:
+                ordered_indices.append(t.get_text()) # the df indices will be strings when clustering states
             x_positions.append(t.get_position())
         x_positions = np.array(x_positions)
     else:
         for t in ax.get_yticklabels():
-            ordered_indices.append(float(t.get_text()))
+            try:
+                ordered_indices.append(float(t.get_text())) 
+            except:
+                ordered_indices.append(t.get_text()) # the df indices will be strings when clustering states
             x_positions.append(t.get_position())
         x_positions = np.array(x_positions)
 
@@ -71,8 +79,11 @@ def get_cluster_annotation_positions(clusters, threshold, ax, orientation):
         else:
             vals = x_positions[np.where(clusters.loc[ordered_indices]['cluster']==cluster)][:,1]
         xs.append(np.median(vals))
-
-    ys = [threshold] * len(xs)
+    
+    if max_cor < threshold:
+        ys = [max_cor] * len(xs)
+    else:   
+        ys = [threshold] * len(xs)
 
     return xs, ys
 
@@ -109,6 +120,10 @@ def show_dendrogram(HAC,
                      cutoff_line=False,
                      annotate_clusters=True,
                      sub_cluster=None):
+    # get max corr distance in case it's less than the cutoff and use it for the
+    # location of the annotations
+    max_cor = HAC.corr_distance.max().max()   
+
     if orientation == 'top':
         fig, ax = plt.subplots(figsize=(8,5)) # 40, 15
     elif orientation == 'right':
@@ -130,12 +145,13 @@ def show_dendrogram(HAC,
     
     # Annotate the first occurrence of each cluster label
     # treats the label as being on the x axis and then flips it after if it's oriented "right"
-    xs, ys = get_cluster_annotation_positions(clusters, threshold, ax, orientation)
+    xs, ys = get_cluster_annotation_positions(clusters, threshold, ax, orientation, max_cor)
     if orientation == 'top':
         pass
     elif orientation == 'right': 
         xs, ys = ys, xs
     if annotate_clusters == True:
+
         for i, (x, y) in enumerate(zip(xs,ys)):
             # TODO: option to rotate these ids by 90 so you can view the dendrogram
             # enlarged somewhere else and rotated to more easily see which residues
