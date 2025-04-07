@@ -41,7 +41,18 @@ class HAC:
         self.n_clusters = self.clusters['cluster'].max()
         if sub_cluster_cutoff is not None:
             self.sub_cluster_ids = self.get_clusters_above_cutoff(cutoff=sub_cluster_cutoff)
+        check_duplicate = self.check_duplicate_indices()
+        if check_duplicate:
+            raise ValueError('Duplicate indices found in the dataframe. Please fix this before proceeding.')
+        
             
+    def check_duplicate_indices(self):
+        'Check if there are duplicate indices in the dataframe'
+        if self.df.index.duplicated().any():
+            print('Duplicate indices found in the dataframe. Please fix this before proceeding.')
+            return True
+        else:
+            return False
 
     def get_corr_above(self, cutoff):
         'Return a df with correlation above cutoff'
