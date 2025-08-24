@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools",
+            "setuptools_scm",
+            ]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pychesca"
+version = "0.7.0"
+
+description = """
+Chemical Shift Covariance Analysis
+"""
+
+authors = [{name = "Dan Burns", email = "dnlburns808@gmail.com"}]
+license = {file = "LICENSE"}
+readme = "README.md"
+dependencies = [
+            "numpy",
+            "pandas",
+            "scipy",
+            "seaborn",
+            "matplotlib"
+            "sklearn"
+            ]
+
+[tool.setuptools.packages.find]
+where = ["."]  
+include = ["*"]  # ["*"] by default
+namespaces = false 
+
+[project.scripts]
+run-chesca = "pychesca.scripts.run_chesca:main"
+
+[tool.ruff]
+# Match Black's default line length
+line-length = 88
+# Lint rules: E=pycodestyle, F=pyflakes, I=isort, B=bugbear
+select = ["E", "F", "I", "B"]
+exclude = [
+    "tests/data",        # Ignore large test data
+    "dist",              # Build artifacts
+    "build",
+    ".venv",
+]
+# Automatically fix simple issues (when using --fix)
+fix = true
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+exclude = "tests/data"

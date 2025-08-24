@@ -1,0 +1,14 @@
+name: chesca-env
+channels:
+  - conda-forge
+  - defaults
+dependencies: 
+  - pandas
+  - scipy
+  - matplotlib
+  - scikit-learn  
+  - networkx
+ 
+  
+  
+    
