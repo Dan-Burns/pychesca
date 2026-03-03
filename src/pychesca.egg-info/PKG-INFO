@@ -1,3 +1,31 @@
+Metadata-Version: 2.4
+Name: pychesca
+Version: 0.1.0
+Summary: Chemical Shift Covariance Analysis (CHESCA) for NMR data
+Author: Dan Burns
+License: MIT
+Keywords: NMR,CHESCA,chemical shift,covariance analysis,structural biology
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: Topic :: Scientific/Engineering :: Chemistry
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.23
+Requires-Dist: pandas>=1.5
+Requires-Dist: scipy>=1.9
+Requires-Dist: scikit-learn>=1.2
+Requires-Dist: matplotlib>=3.6
+Requires-Dist: seaborn>=0.12
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+
 # pychesca
 
 **Chemical Shift Covariance Analysis (CHESCA) in Python**
