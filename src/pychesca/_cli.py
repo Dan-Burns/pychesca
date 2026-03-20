@@ -58,12 +58,12 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-linkage",
-        default="single",
+        default="complete",
         choices=["complete", "single", "average", "ward"],
         metavar="METHOD",
         help=(
             "Linkage method for hierarchical clustering: "
-            "'single' (default), 'complete', 'average', or 'ward'. "
+            "'complete' (default), 'single', 'average', or 'ward'. "
             "Note: 'ward' requires metric='euclidean'."
         ),
     )

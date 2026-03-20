@@ -26,7 +26,7 @@ class HAC:
         Correlation cutoff as a percentage (e.g. 98.0) or fraction (e.g. 0.98).
         Residues with absolute correlation above this threshold are grouped.
     method : str
-        Linkage method passed to ``AgglomerativeClustering``. Default 'single'.
+        Linkage method passed to ``AgglomerativeClustering``. Default 'complete'.
     metric : str
         Distance metric. Default 'euclidean'.
     cluster_states : bool
@@ -41,7 +41,7 @@ class HAC:
         self,
         df: pd.DataFrame,
         cutoff: float = 98.0,
-        method: str = "single",
+        method: str = "complete",
         metric: str = "euclidean",
         cluster_states: bool = False,
         sub_cluster_cutoff: int | None = None,
