@@ -9,9 +9,8 @@ Implements the CHESCA framework from:
 > *Scientific Reports*, 4, 7306.
 
 ## Run pychesca in the cloud
----
+
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Dan-Burns/pychesca/blob/main/pychesca_colab.ipynb)
----
 
 ## Installation
 
