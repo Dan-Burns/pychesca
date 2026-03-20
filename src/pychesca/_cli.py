@@ -56,6 +56,17 @@ def _build_parser() -> argparse.ArgumentParser:
             "state analysis. Omit to skip sub-clustering."
         ),
     )
+    parser.add_argument(
+        "-linkage",
+        default="complete",
+        choices=["complete", "single", "average", "ward"],
+        metavar="METHOD",
+        help=(
+            "Linkage method for hierarchical clustering: "
+            "'complete' (default), 'single', 'average', or 'ward'. "
+            "Note: 'ward' requires metric='euclidean'."
+        ),
+    )
     return parser
 
 
@@ -93,10 +104,11 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Correlation cutoff: {cutoff}%")
 
     # --- Clustering ---
+    print(f"Linkage method    : {args.linkage}")
     if args.minimum_cluster is not None:
-        hac = HAC(df, cutoff, sub_cluster_cutoff=args.minimum_cluster)
+        hac = HAC(df, cutoff, method=args.linkage, sub_cluster_cutoff=args.minimum_cluster)
     else:
-        hac = HAC(df, cutoff)
+        hac = HAC(df, cutoff, method=args.linkage)
 
     # --- Plots ---
     plot_corr(hac, cutoff, save_file=f"{out}/correlation_matrix.pdf")
