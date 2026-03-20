@@ -8,12 +8,15 @@ Implements the CHESCA framework from:
 > A tool set to map allosteric networks through the NMR chemical shift covariance analysis.
 > *Scientific Reports*, 4, 7306.
 
+## Run pychesca in the cloud
+---
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Dan-Burns/pychesca/blob/main/pychesca_colab.ipynb)
 ---
 
 ## Installation
 
 ```bash
-pip install pychesca
+pip install git+https://github.com/Dan-Burns/pychesca.git
 ```
 
 Or install from source in editable mode:
